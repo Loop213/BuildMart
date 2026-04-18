@@ -11,6 +11,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
+import uploadRoutes from "./routes/uploadRoutes.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 dotenv.config();
@@ -70,6 +71,7 @@ app.use("/api/addresses", addressRoutes);
 app.use("/api/coupons", couponRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/uploads", uploadRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

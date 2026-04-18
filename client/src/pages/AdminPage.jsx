@@ -5,6 +5,7 @@ import useSWR from "swr";
 import { mutate } from "swr";
 import { request } from "../api/http";
 import { printInvoice } from "../utils/invoice";
+import { ImageUploadField } from "../components/ImageUploadField";
 import { OrderTimeline } from "../components/OrderTimeline";
 import { PaymentPassbookTable } from "../components/PaymentPassbookTable";
 import { ProgressBar } from "../components/ProgressBar";
@@ -390,7 +391,6 @@ export function AdminPage() {
                 ["name", "Product name"],
                 ["price", "Price"],
                 ["unit", "Unit"],
-                ["image", "Image URL"],
                 ["stock", "Stock"],
                 ["description", "Description"]
               ].map(([field, placeholder]) => (
@@ -403,6 +403,13 @@ export function AdminPage() {
                   className="input-field"
                 />
               ))}
+              <ImageUploadField
+                label="Product image"
+                value={productForm.image}
+                onChange={(value) => setProductForm((current) => ({ ...current, image: value }))}
+                placeholder="Product image URL"
+                folder="buildmart/products"
+              />
               <select
                 value={productForm.category}
                 onChange={(event) => setProductForm((current) => ({ ...current, category: event.target.value }))}
@@ -691,12 +698,40 @@ export function AdminPage() {
               <input value={settingsForm.companyPhone} onChange={(event) => setSettingsForm((current) => ({ ...current, companyPhone: event.target.value }))} placeholder="Company phone" className="input-field" />
               <input value={settingsForm.companyEmail} onChange={(event) => setSettingsForm((current) => ({ ...current, companyEmail: event.target.value }))} placeholder="Company email" className="input-field" />
               <input value={settingsForm.upiId} onChange={(event) => setSettingsForm((current) => ({ ...current, upiId: event.target.value }))} placeholder="admin@upi" className="input-field" />
-              <input value={settingsForm.qrCodeUrl} onChange={(event) => setSettingsForm((current) => ({ ...current, qrCodeUrl: event.target.value }))} placeholder="QR image URL" className="input-field" />
               <input type="number" min="0" max="100" value={settingsForm.gstPercentage} onChange={(event) => setSettingsForm((current) => ({ ...current, gstPercentage: event.target.value }))} placeholder="GST Percentage" className="input-field" />
               <input value={settingsForm.gstNumber} onChange={(event) => setSettingsForm((current) => ({ ...current, gstNumber: event.target.value }))} placeholder="GST Number (optional)" className="input-field" />
-              <input value={settingsForm.logoUrl} onChange={(event) => setSettingsForm((current) => ({ ...current, logoUrl: event.target.value }))} placeholder="Company logo image URL" className="input-field" />
-              <input value={settingsForm.signatureUrl} onChange={(event) => setSettingsForm((current) => ({ ...current, signatureUrl: event.target.value }))} placeholder="Signature image URL" className="input-field" />
-              <input value={settingsForm.stampUrl} onChange={(event) => setSettingsForm((current) => ({ ...current, stampUrl: event.target.value }))} placeholder="Stamp image URL" className="input-field" />
+              <ImageUploadField
+                label="UPI QR code"
+                value={settingsForm.qrCodeUrl}
+                onChange={(value) => setSettingsForm((current) => ({ ...current, qrCodeUrl: value }))}
+                placeholder="QR image URL"
+                folder="buildmart/settings"
+                previewClassName="h-40 w-40 rounded-2xl object-cover"
+              />
+              <ImageUploadField
+                label="Company logo"
+                value={settingsForm.logoUrl}
+                onChange={(value) => setSettingsForm((current) => ({ ...current, logoUrl: value }))}
+                placeholder="Company logo image URL"
+                folder="buildmart/settings"
+                previewClassName="h-32 w-full rounded-2xl bg-white object-contain p-2"
+              />
+              <ImageUploadField
+                label="Signature image"
+                value={settingsForm.signatureUrl}
+                onChange={(value) => setSettingsForm((current) => ({ ...current, signatureUrl: value }))}
+                placeholder="Signature image URL"
+                folder="buildmart/settings"
+                previewClassName="h-24 w-full rounded-2xl bg-white object-contain p-2"
+              />
+              <ImageUploadField
+                label="Stamp image"
+                value={settingsForm.stampUrl}
+                onChange={(value) => setSettingsForm((current) => ({ ...current, stampUrl: value }))}
+                placeholder="Stamp image URL"
+                folder="buildmart/settings"
+                previewClassName="h-24 w-full rounded-2xl bg-white object-contain p-2"
+              />
               <textarea value={settingsForm.termsAndConditions} onChange={(event) => setSettingsForm((current) => ({ ...current, termsAndConditions: event.target.value }))} placeholder="Terms & Conditions" rows={4} className="input-field min-h-[120px] resize-none" />
             </div>
             <button type="submit" className="mt-6 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white dark:bg-brand-500">

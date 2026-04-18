@@ -26,6 +26,7 @@ import { useAuth } from "../context/AuthContext";
 import { request } from "../api/http";
 import { useTheme } from "../context/ThemeContext";
 import { printInvoice } from "../utils/invoice";
+import { ImageUploadField } from "../components/ImageUploadField";
 import { DashboardSidebar } from "../components/DashboardSidebar";
 import { DashboardSkeleton } from "../components/DashboardSkeleton";
 import { EmptyState } from "../components/EmptyState";
@@ -972,11 +973,13 @@ export function DashboardPage({ initialSection = "profile" }) {
                   placeholder="Additional notes"
                   className="input-field"
                 />
-                <input
+                <ImageUploadField
+                  label="Payment screenshot"
                   value={requestForm.screenshotUrl}
-                  onChange={(event) => setRequestForm((current) => ({ ...current, screenshotUrl: event.target.value }))}
-                  placeholder="Screenshot upload placeholder URL"
-                  className="input-field"
+                  onChange={(value) => setRequestForm((current) => ({ ...current, screenshotUrl: value }))}
+                  placeholder="Screenshot image URL"
+                  folder="buildmart/payment-requests"
+                  previewClassName="h-40 w-full rounded-2xl object-contain bg-slate-50 p-2 dark:bg-slate-900"
                 />
               </div>
 
