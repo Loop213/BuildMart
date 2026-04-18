@@ -210,6 +210,7 @@ export const createOrder = asyncHandler(async (req, res) => {
 
     const order = await Order.create({
       user: req.user._id,
+      userStatusSnapshot: req.user.status || "pending",
       items: payload.normalizedItems,
       shippingAddress: payload.resolvedAddress,
       subtotal: payload.subtotal,
@@ -285,6 +286,7 @@ export const createOrder = asyncHandler(async (req, res) => {
           [
             {
               user: req.user._id,
+              userStatusSnapshot: req.user.status || "pending",
               items: payload.normalizedItems,
               shippingAddress: payload.resolvedAddress,
               subtotal: payload.subtotal,

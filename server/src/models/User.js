@@ -6,7 +6,13 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true, minlength: 6 },
-    role: { type: String, enum: ["admin", "customer"], default: "customer" }
+    role: { type: String, enum: ["admin", "customer"], default: "customer" },
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
+      index: true
+    }
   },
   { timestamps: true }
 );
@@ -24,4 +30,3 @@ userSchema.methods.comparePassword = function comparePassword(password) {
 };
 
 export const User = mongoose.model("User", userSchema);
-

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -23,7 +24,7 @@ export function AuthPage() {
       await authAction(payload);
       navigate("/");
     } catch (error) {
-      alert(error.message || "Login failed");
+      toast.error(error.message || "Login failed");
     }
   }
 
@@ -40,6 +41,9 @@ export function AuthPage() {
         <p className="mt-4 text-slate-500 dark:text-slate-400">
           Sign in as a customer to track dues and invoices, or use an admin account to manage products, coupons, and UPI payments.
         </p>
+        <div className="mt-6 rounded-[24px] border border-amber-200 bg-amber-50/80 p-4 text-sm text-amber-700 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-300">
+          New customer accounts start with <strong>Pending Approval</strong>. You can still login and use the app while admin review is in progress.
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="rounded-[28px] border border-white/10 bg-white/80 p-8 shadow-sm dark:bg-slate-900/80">

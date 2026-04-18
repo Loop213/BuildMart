@@ -39,6 +39,11 @@ const orderItemSchema = new mongoose.Schema(
 const orderSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    userStatusSnapshot: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending"
+    },
     items: [orderItemSchema],
     shippingAddress: { type: shippingAddressSchema, required: true },
     subtotal: { type: Number, required: true },

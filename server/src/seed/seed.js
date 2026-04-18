@@ -17,13 +17,15 @@ async function seed() {
       name: "Admin User",
       email: "admin@buildmart.com",
       password: "Admin@123",
-      role: "admin"
+      role: "admin",
+      status: "approved"
     },
     {
       name: "Site Contractor",
       email: "customer@buildmart.com",
       password: "Customer@123",
-      role: "customer"
+      role: "customer",
+      status: "approved"
     }
   ]);
 

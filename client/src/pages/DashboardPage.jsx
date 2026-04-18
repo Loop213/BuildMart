@@ -93,6 +93,26 @@ function buildLineData(orders) {
   }));
 }
 
+function getUserStatusClasses(status) {
+  if (status === "approved") {
+    return "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-300";
+  }
+  if (status === "rejected") {
+    return "bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-300";
+  }
+  return "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-300";
+}
+
+function getUserStatusLabel(status) {
+  if (status === "approved") {
+    return "Approved";
+  }
+  if (status === "rejected") {
+    return "Rejected";
+  }
+  return "Pending Approval";
+}
+
 function SectionCard({ title, description, action, children }) {
   return (
     <section className="rounded-[32px] border border-white/10 bg-white/80 p-6 shadow-sm dark:bg-slate-900/80 md:p-8">
@@ -129,6 +149,11 @@ function ProfileHeader({ user, onUpload, onEdit, onLogout }) {
           <div>
             <p className="text-sm uppercase tracking-[0.35em] text-brand-500">Customer workspace</p>
             <h1 className="mt-3 font-display text-3xl font-semibold text-slate-900 dark:text-white">{user?.name}</h1>
+            <div className="mt-3">
+              <span className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] ${getUserStatusClasses(user?.status)}`}>
+                {getUserStatusLabel(user?.status)}
+              </span>
+            </div>
             <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-500 dark:text-slate-400">
               <span className="inline-flex items-center gap-2"><Phone size={14} /> {user?.phone || "Add phone number"}</span>
               <span className="inline-flex items-center gap-2"><Mail size={14} /> {user?.email}</span>
@@ -150,7 +175,7 @@ function ProfileHeader({ user, onUpload, onEdit, onLogout }) {
 }
 
 export function DashboardPage({ initialSection = "profile" }) {
-  const { user, logout, updateProfile, updateAvatar, changePassword } = useAuth();
+  const { user, logout, updateProfile, updateAvatar, changePassword, getStatusMessage } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { data, isLoading } = useSWR("/orders/my-orders", { refreshInterval: 5000 });
   const { data: addressData, isLoading: addressesLoading } = useSWR("/addresses", { refreshInterval: 5000 });
@@ -495,6 +520,14 @@ export function DashboardPage({ initialSection = "profile" }) {
       />
 
       <div className="space-y-6">
+        {user?.status ? (
+          <div className={`rounded-[28px] border p-5 shadow-sm ${user.status === "approved" ? "border-emerald-200 bg-emerald-50/80 dark:border-emerald-500/20 dark:bg-emerald-500/10" : user.status === "rejected" ? "border-rose-200 bg-rose-50/80 dark:border-rose-500/20 dark:bg-rose-500/10" : "border-amber-200 bg-amber-50/80 dark:border-amber-500/20 dark:bg-amber-500/10"}`}>
+            <p className="text-sm font-semibold text-slate-900 dark:text-white">
+              Account Status: {getUserStatusLabel(user.status)}
+            </p>
+            <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{getStatusMessage(user.status)}</p>
+          </div>
+        ) : null}
         <ProfileHeader
           user={user}
           onUpload={handleAvatarUpload}

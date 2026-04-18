@@ -2,6 +2,16 @@ import { User } from "../models/User.js";
 import { generateToken } from "../utils/generateToken.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 
+function serializeUser(user) {
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    status: user.status
+  };
+}
+
 export const signup = asyncHandler(async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -15,12 +25,8 @@ export const signup = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     token: generateToken(user._id),
-    user: {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-    }
+    user: serializeUser(user),
+    message: "Signup successful. Your account is under admin review."
   });
 });
 
@@ -35,11 +41,12 @@ export const login = asyncHandler(async (req, res) => {
 
   res.json({
     token: generateToken(user._id),
-    user: {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role
-    }
+    user: serializeUser(user),
+    message:
+      user.status === "pending"
+        ? "Login successful. Your account is under admin review."
+        : user.status === "rejected"
+          ? "Login successful. Your account is marked as rejected."
+          : "Login successful."
   });
 });

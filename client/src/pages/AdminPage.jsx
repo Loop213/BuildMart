@@ -59,10 +59,13 @@ export function AdminPage() {
   const [approvalLoadingId, setApprovalLoadingId] = useState("");
   const [rejectingPayment, setRejectingPayment] = useState(null);
   const [rejectReason, setRejectReason] = useState("");
+  const [userFilter, setUserFilter] = useState("all");
+  const [userLoadingId, setUserLoadingId] = useState("");
   const { data: analytics } = useSWR("/admin/analytics", { refreshInterval: 5000 });
   const { data: products } = useSWR("/products?page=1&limit=50");
   const { data: orders } = useSWR("/orders", { refreshInterval: 5000 });
   const { data: coupons } = useSWR("/coupons");
+  const { data: users } = useSWR(`/admin/users?status=${encodeURIComponent(userFilter)}`, { refreshInterval: 5000 });
   const { data: pendingPayments } = useSWR(`/payments/pending?status=${encodeURIComponent(approvalFilter)}`, {
     refreshInterval: 5000
   });
@@ -264,10 +267,24 @@ export function AdminPage() {
     }
   }
 
+  async function updateUserStatus(userId, nextStatus) {
+    setUserLoadingId(userId);
+    try {
+      await request(`/admin/${nextStatus}/${userId}`, { method: "PATCH" });
+      toast.success(`User ${nextStatus} successfully`);
+      mutate(`/admin/users?status=${encodeURIComponent(userFilter)}`);
+      mutate("/admin/analytics");
+    } catch (error) {
+      toast.error(error.message || "Unable to update user status");
+    } finally {
+      setUserLoadingId("");
+    }
+  }
+
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap gap-3">
-        {["overview", "products", "orders", "approvals", "coupons", "upi"].map((tab) => (
+        {["overview", "products", "orders", "users", "approvals", "coupons", "upi"].map((tab) => (
           <button
             key={tab}
             type="button"
@@ -280,17 +297,87 @@ export function AdminPage() {
       </div>
 
       {activeTab === "overview" && (
-        <section className="grid gap-4 md:grid-cols-3">
+        <section className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
           {[
             ["Total Sales", `Rs. ${(analytics?.totalSales || 0).toLocaleString("en-IN")}`],
             ["Pending Payments", `Rs. ${(analytics?.pendingPayments || 0).toLocaleString("en-IN")}`],
-            ["Orders", analytics?.orderCount || 0]
+            ["Orders", analytics?.orderCount || 0],
+            ["Pending Users", analytics?.userStatusCounts?.pending || 0],
+            ["Approved Users", analytics?.userStatusCounts?.approved || 0],
+            ["Rejected Users", analytics?.userStatusCounts?.rejected || 0]
           ].map(([label, value]) => (
             <div key={label} className="rounded-[28px] border border-white/10 bg-white/80 p-6 shadow-sm dark:bg-slate-900/80">
               <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
               <p className="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">{value}</p>
             </div>
           ))}
+        </section>
+      )}
+
+      {activeTab === "users" && (
+        <section className="space-y-6">
+          <div className="flex flex-wrap gap-3">
+            {[
+              ["all", "All"],
+              ["pending", "Pending"],
+              ["approved", "Approved"],
+              ["rejected", "Rejected"]
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setUserFilter(value)}
+                className={`rounded-full px-4 py-2 text-sm font-medium ${userFilter === value ? "bg-brand-500 text-white" : "bg-white/80 text-slate-600 dark:bg-slate-900/80 dark:text-slate-300"}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className="rounded-[28px] border border-white/10 bg-white/80 p-6 shadow-sm dark:bg-slate-900/80">
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">User approval management</h2>
+            <div className="mt-5 space-y-4">
+              {users?.users?.map((account) => (
+                <div key={account._id} className="rounded-[24px] bg-slate-50/70 p-4 dark:bg-slate-950/60">
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div>
+                      <p className="font-semibold text-slate-900 dark:text-white">{account.name}</p>
+                      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        {account.email} • {account.role} • Joined {new Date(account.createdAt).toLocaleDateString("en-IN")}
+                      </p>
+                      <p className="mt-2">
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.15em] ${account.status === "approved" ? "bg-emerald-100 text-emerald-700" : account.status === "rejected" ? "bg-rose-100 text-rose-700" : "bg-amber-100 text-amber-700"}`}>
+                          {account.status}
+                        </span>
+                      </p>
+                    </div>
+                    {account.role !== "admin" ? (
+                      <div className="flex flex-wrap gap-3">
+                        <button
+                          type="button"
+                          disabled={userLoadingId === account._id || account.status === "approved"}
+                          onClick={() => updateUserStatus(account._id, "approve")}
+                          className="rounded-full bg-emerald-100 px-4 py-2 text-sm font-semibold text-emerald-700 disabled:opacity-50"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          type="button"
+                          disabled={userLoadingId === account._id || account.status === "rejected"}
+                          onClick={() => updateUserStatus(account._id, "reject")}
+                          className="rounded-full bg-rose-100 px-4 py-2 text-sm font-semibold text-rose-700 disabled:opacity-50"
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    ) : (
+                      <span className="text-sm text-slate-400 dark:text-slate-500">Admin account</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
       )}
 

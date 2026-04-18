@@ -207,6 +207,11 @@ export function CartPage() {
         })
       });
       toast.success("Order placed successfully");
+      if (user?.status === "pending") {
+        toast("Your account is pending approval, but your order is accepted.", {
+          icon: "⏳"
+        });
+      }
       clearCart();
       setCoupon(null);
       setCouponCode("");
@@ -223,6 +228,16 @@ export function CartPage() {
           <div>
             <h1 className="font-display text-3xl font-semibold text-slate-900 dark:text-white">Cart Summary</h1>
             <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">Adjust quantity, review saved addresses, and complete checkout.</p>
+            {user?.status === "pending" ? (
+              <p className="mt-3 rounded-full bg-amber-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
+                Your account is pending approval, but orders are still accepted
+              </p>
+            ) : null}
+            {user?.status === "rejected" ? (
+              <p className="mt-3 rounded-full bg-rose-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-rose-700 dark:bg-rose-500/10 dark:text-rose-300">
+                Account marked rejected, but ordering is still available
+              </p>
+            ) : null}
           </div>
         </div>
 

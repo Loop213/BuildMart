@@ -30,6 +30,16 @@ function mergeStoredProfile(user) {
   };
 }
 
+function getStatusMessage(status) {
+  if (status === "pending") {
+    return "Your account is under admin review.";
+  }
+  if (status === "rejected") {
+    return "Your account is marked as rejected.";
+  }
+  return "Your account is approved.";
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     const stored = localStorage.getItem("buildmart_user");
@@ -55,7 +65,7 @@ export function AuthProvider({ children }) {
       localStorage.setItem("buildmart_token", data.token);
       const mergedUser = mergeStoredProfile(data.user);
       setUser(mergedUser);
-      toast.success(`Welcome back, ${mergedUser.name}`);
+      toast.success(data.message || `Welcome back, ${mergedUser.name}`);
       return mergedUser;
     } finally {
       setLoading(false);
@@ -72,7 +82,7 @@ export function AuthProvider({ children }) {
       localStorage.setItem("buildmart_token", data.token);
       const mergedUser = mergeStoredProfile(data.user);
       setUser(mergedUser);
-      toast.success("Account created successfully");
+      toast.success(data.message || "Account created successfully");
       return mergedUser;
     } finally {
       setLoading(false);
@@ -126,7 +136,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, signup, logout, updateProfile, updateAvatar, changePassword }}
+      value={{ user, loading, login, signup, logout, updateProfile, updateAvatar, changePassword, getStatusMessage }}
     >
       {children}
     </AuthContext.Provider>
