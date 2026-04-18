@@ -17,6 +17,10 @@ export async function protect(req, res, next) {
     return res.status(401).json({ message: "User no longer exists" });
   }
 
+  if (req.user.status === "rejected") {
+    return res.status(403).json({ message: "Account rejected. Contact admin." });
+  }
+
   next();
 }
 
@@ -26,4 +30,3 @@ export function adminOnly(req, res, next) {
   }
   next();
 }
-

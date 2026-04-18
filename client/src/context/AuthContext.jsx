@@ -55,6 +55,17 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
+  useEffect(() => {
+    function handleBlockedAuth(event) {
+      localStorage.removeItem("buildmart_token");
+      setUser(null);
+      toast.error(event.detail?.message || "Account rejected. Contact admin.");
+    }
+
+    window.addEventListener("buildmart:auth-blocked", handleBlockedAuth);
+    return () => window.removeEventListener("buildmart:auth-blocked", handleBlockedAuth);
+  }, []);
+
   async function login(payload) {
     setLoading(true);
     try {

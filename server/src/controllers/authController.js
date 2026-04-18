@@ -39,6 +39,11 @@ export const login = asyncHandler(async (req, res) => {
     throw new Error("Invalid email or password");
   }
 
+  if (user.status === "rejected") {
+    res.status(403);
+    throw new Error("Your account has been rejected by admin.");
+  }
+
   res.json({
     token: generateToken(user._id),
     user: serializeUser(user),

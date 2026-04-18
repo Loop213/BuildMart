@@ -166,6 +166,10 @@ export function CartPage() {
       toast.error("Please login before placing an order");
       return;
     }
+    if (user.status === "rejected") {
+      toast.error("Account rejected. Contact admin.");
+      return;
+    }
     if (!items.length) {
       toast.error("Cart is empty");
       return;

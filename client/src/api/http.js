@@ -15,6 +15,13 @@ export async function request(path, options = {}) {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
+    if (response.status === 403 && /account rejected/i.test(data.message || "")) {
+      window.dispatchEvent(
+        new CustomEvent("buildmart:auth-blocked", {
+          detail: { message: data.message || "Account rejected. Contact admin." }
+        })
+      );
+    }
     throw new Error(data.message || "Something went wrong");
   }
 

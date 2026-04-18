@@ -8,10 +8,13 @@ export function ProtectedRoute({ children, adminOnly = false }) {
     return <Navigate to="/auth" replace />;
   }
 
+  if (user.status === "rejected") {
+    return <Navigate to="/auth" replace />;
+  }
+
   if (adminOnly && user.role !== "admin") {
     return <Navigate to="/" replace />;
   }
 
   return children;
 }
-
