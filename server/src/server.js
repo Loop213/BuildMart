@@ -17,9 +17,41 @@ dotenv.config();
 
 const app = express();
 
+function normalizeOrigin(origin) {
+  return String(origin || "").replace(/\/+$/, "");
+}
+
+const allowedOrigins = new Set(
+  [
+    process.env.CLIENT_URL,
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5175",
+    "https://build-mart-client-khaki.vercel.app"
+  ]
+    .filter(Boolean)
+    .map(normalizeOrigin)
+);
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin(origin, callback) {
+      const normalizedOrigin = normalizeOrigin(origin);
+      let isVercelPreview = false;
+
+      if (normalizedOrigin) {
+        try {
+          isVercelPreview = /\.vercel\.app$/i.test(new URL(normalizedOrigin).hostname);
+        } catch {
+          isVercelPreview = false;
+        }
+      }
+
+      if (!origin || allowedOrigins.has(normalizedOrigin) || isVercelPreview) {
+        return callback(null, true);
+      }
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true
   })
 );

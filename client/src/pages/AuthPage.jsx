@@ -19,8 +19,12 @@ export function AuthPage() {
     event.preventDefault();
     const payload = mode === "login" ? loginData : signupData;
     const authAction = mode === "login" ? login : signup;
-    await authAction(payload);
-    navigate("/");
+    try {
+      await authAction(payload);
+      navigate("/");
+    } catch (error) {
+      alert(error.message || "Login failed");
+    }
   }
 
   const formData = mode === "login" ? loginData : signupData;
